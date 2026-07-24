@@ -1,0 +1,104 @@
+openapi: 3.0.3
+info:
+  title: Airline Voucher Seat Assignment API
+  description: >
+    API for generating exactly three unique random voucher seats per flight,
+    based on aircraft-specific seat layouts (ATR, Airbus 320, Boeing 737 Max).
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8000/api
+    description: Unversioned (matches task spec exactly)
+  - url: http://localhost:8000/api/v1
+    description: Versioned API
+tags:
+  - name: Vouchers
+paths:
+  /check:
+    post:
+      tags: [Vouchers]
+      summary: Check whether vouchers already exist for a flight number + date
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [flightNumber, date]
+              properties:
+                flightNumber:
+                  type: string
+                  example: GA102
+                date:
+                  type: string
+                  format: date
+                  example: "2025-07-12"
+      responses:
+        '200':
+          description: Existence check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+              example:
+                exists: true
+        '422':
+          description: Validation error
+  /generate:
+    post:
+      tags: [Vouchers]
+      summary: Generate exactly three unique random voucher seats
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, id, flightNumber, date, aircraft]
+              properties:
+                name:
+                  type: string
+                  example: Sarah
+                id:
+                  type: string
+                  example: "98123"
+                flightNumber:
+                  type: string
+                  example: GA102
+                date:
+                  type: string
+                  format: date
+                  example: "2025-07-12"
+                aircraft:
+                  type: string
+                  enum: [ATR, "Airbus 320", "Boeing 737 Max"]
+                  example: "Airbus 320"
+      responses:
+        '201':
+          description: Seats generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  seats:
+                    type: array
+                    items:
+                      type: string
+              example:
+                success: true
+                seats: ["3B", "7C", "14D"]
+        '409':
+          description: Vouchers already exist for this flight/date
+          content:
+            application/json:
+              example:
+                success: false
+                exists: true
+                message: "Vouchers have already been generated for flight GA102 on 2025-07-12."
+        '422':
+          description: Validation error
