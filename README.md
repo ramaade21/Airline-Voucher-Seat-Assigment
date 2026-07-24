@@ -105,23 +105,23 @@ Base URL: `http://localhost:8000/api` (also available under `/api/v1`)
 
 Full OpenAPI/Swagger spec: [`backend/openapi.yaml`](./backend/openapi.yaml) — paste it into [editor.swagger.io](https://editor.swagger.io) to explore interactively.
 
-## 🪟 Quick Start untuk Windows (Laragon)
+## 🪟 Catatan untuk Windows
 
-Untuk testing cepat di **Windows 10 + Laragon**, gunakan script yang sudah disediakan di root project (jalankan lewat **double-click** atau lewat Terminal Laragon):
+Semua contoh command di README ini pakai syntax **bash/Unix** (`cp`, `touch`, dll). Kalau kamu menjalankan dari **Terminal Laragon** atau **Git Bash**, command ini langsung jalan tanpa modifikasi.
 
-| Script       | Fungsi                                                                 |
-|--------------|-------------------------------------------------------------------------|
-| `setup.bat`  | Cek PHP/Composer/Node, install dependency backend & frontend, buat `.env`, generate key, buat `database.sqlite`, jalankan migration, tanya mau seed atau tidak |
-| `start.bat`  | Menjalankan `php artisan serve` dan `npm run dev` masing-masing di jendela CMD terpisah, lalu otomatis membuka browser ke `http://localhost:5173` |
-| `stop.bat`   | Menghentikan proses yang berjalan di port 8000 dan 5173                 |
+Kalau kamu pakai **PowerShell** (default terminal VS Code / Windows Terminal), ganti perintahnya sebagai berikut:
 
-**Langkah:**
-1. Pastikan Laragon sudah terpasang, PHP 8.3+ aktif, extension `pdo_sqlite`/`sqlite3` sudah di-uncomment di `php.ini`, dan Node.js sudah ter-install (lihat detail di bawah).
-2. Extract project, lalu double-click `setup.bat` (sekali saja).
-3. Setelah selesai, double-click `start.bat` setiap kali mau menjalankan aplikasi.
-4. Double-click `stop.bat` untuk menghentikan server.
+| Perintah di README      | Ganti dengan (PowerShell)                          |
+|--------------------------|-----------------------------------------------------|
+| `cp .env.example .env`   | `Copy-Item .env.example .env`                       |
+| `touch database/database.sqlite` | `New-Item -ItemType File -Force -Path database\database.sqlite` |
 
-> Jika `setup.bat`/`start.bat` gagal dijalankan langsung dari File Explorer, buka **Terminal Laragon**, `cd` ke folder project, lalu jalankan `setup.bat` / `start.bat` dari situ — ini menghindari masalah PATH pada CMD default Windows.
+Kalau pakai **Command Prompt (cmd.exe)**:
+
+| Perintah di README      | Ganti dengan (CMD)                                  |
+|--------------------------|-----------------------------------------------------|
+| `cp .env.example .env`   | `copy .env.example .env`                            |
+| `touch database/database.sqlite` | `type nul > database\database.sqlite`              |
 
 ## 🧰 Cara Install
 
@@ -164,6 +164,8 @@ touch database/database.sqlite    # buat file SQLite kosong
 php artisan migrate               # membuat tabel, termasuk "vouchers"
 php artisan db:seed               # opsional: isi data contoh
 ```
+
+> 💻 Pengguna Windows: ganti `touch database/database.sqlite` sesuai tabel di [Catatan untuk Windows](#-catatan-untuk-windows) di atas.
 
 Perintah `migrate` akan membuat tabel `vouchers` beserta unique index gabungan `flight_number + flight_date`, sesuai requirement.
 
@@ -220,7 +222,12 @@ Fill Form → POST /api/check
                     Display 3 Seats
 ```
 
+## Troubleshooting
+
+- **Error `The bootstrap/cache directory must be present and writable`** saat `composer install`: folder kosong (`bootstrap/cache`, `storage/framework/*`, `storage/logs`) memang perlu ada sebelum Laravel bisa jalan. Folder ini sudah disertakan lewat file `.gitkeep` di repo ini — kalau tetap terjadi, buat manual folder tersebut lalu ulangi `composer install`.
+- **Error `could not find driver` / migration gagal**: pastikan extension `pdo_sqlite` dan `sqlite3` aktif di `php.ini` (uncomment baris `extension=pdo_sqlite` dan `extension=sqlite3`), lalu restart PHP/Laragon.
+- **Frontend tidak bisa connect ke backend (CORS error)**: pastikan `CORS_ALLOWED_ORIGINS` di `backend/.env` mencantumkan origin frontend kamu (default `http://localhost:5173`).
+
 ## Notes
 
-- This sandbox environment could not reach `packagist.org`, so `vendor/` is not pre-installed — run `composer install` per the instructions above to fetch Laravel framework dependencies.
 - The `.env` file is intentionally excluded from version control; `.env.example` is provided for both backend and frontend.

@@ -1,0 +1,6 @@
+# Local convenience scripts for Windows (not part of the documented setup)
+*.bat
+
+# OS files
+.DS_Store
+Thumbs.db
